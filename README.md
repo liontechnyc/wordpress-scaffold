@@ -6,6 +6,12 @@
 
 > You will need [Docker](https://www.docker.com/get-started) running on your machine.
 
+First copy and configure environment variables: 
+
+`cp template.env .env`
+
+With your favorite text editor configure your `.env` file.
+
 Start environment with Docker Compose:
 
 `docker-compose up`
