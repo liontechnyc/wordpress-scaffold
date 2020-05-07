@@ -6,6 +6,14 @@
 
 > You will need [Docker](https://www.docker.com/get-started) running on your machine.
 
+Start environment with Docker Compose:
+
+`docker-compose up`
+
+Stop the environment:
+
+`docker-compose down`
+
 ## Important Notes
 
 ### Running in Windows
