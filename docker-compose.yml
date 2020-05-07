@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  db:
+    container_name: wp_database
+    image: mysql:5.7
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+
+  wordpress:
+    container_name: wp_worker
+    image: wordpress:latest
+    working_dir: /var/www/html
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${DB_USER}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: wp_
+    volumes:
+      - ./wp-content:/var/www/html/wp-content
