@@ -1,29 +1,58 @@
-version: '3'
+version: '3.1'
 
 services:
   db:
     container_name: wp_database
-    image: mysql:5.7
+    image: mariadb:10.1
+    command: --default-authentication-plugin=mysql_native_password
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks: 
+      - private-tier
+    environment: 
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   wordpress:
     container_name: wp_worker
-    image: wordpress:latest
+    image: wordpress:fpm-alpine
     working_dir: /var/www/html
     restart: unless-stopped
-    ports:
-      - 8000:80
+    networks: 
+      - private-tier
+      - public-tier
     depends_on:
       - db
     environment:
       WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: ${DB_USER}
-      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
-      WORDPRESS_TABLE_PREFIX: wp_
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_TABLE_PREFIX: ${WORDPRESS_TABLE_PREFIX}
     volumes:
-      - ./wp-content:/var/www/html/wp-content
+      - ${WP_CONTENT}:/var/www/html/wp-content
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - wordpress:/var/www/html
+
+  webserver:
+    container_name: wp_proxy
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:   
+      - wordpress
+    networks: 
+      - public-tier
+    ports:
+      - "8080:80"
+    volumes:
+      - wordpress:/var/www/html
+      - ./nginx:/etc/nginx/conf.d
+      - ./logs/nginx:/var/logs/nginx
+
+networks:
+  private-tier:
+  public-tier:
+
+volumes: 
+  wordpress:
