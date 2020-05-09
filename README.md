@@ -1,6 +1,6 @@
 # Wordpress Stack
 
-> Rapidly launch **Wordpress** application runtime to develop *sites*, *themes* or *plugins*.
+> Rapidly launch **Wordpress** application runtime over **MariaDB** to develop *sites*, *themes* or *plugins*.
 
 ## Development
 
